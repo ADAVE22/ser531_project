@@ -390,8 +390,11 @@ window.onclick = function(e) {
   }
 }
 
-var input_race,input_gender,input_age;
-
+var input_race="",input_gender="",input_age="";
+var table_race = []
+var table_age = []
+var table_gender = []
+var table_name = []
 
  
 function submitRace(race) {
@@ -416,60 +419,19 @@ function submitAge(age) {
 }
 
 
+var len = 0;
+function query_table() {
+     
 
-var settings = {
-  "url": "https://sd-d7b9ce2e.stardog.cloud:5820/State/query",
-  "method": "POST",
-  "timeout": 0,
-  "headers": {
-    "Content-Type": "application/x-www-form-urlencoded",
-    "Authorization": "Basic VGVzdDoxMjM0NTY3ODkxMjM="
-  },
-  "data": {
-    "query": "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>PREFIX ont: <http://www.semanticweb.org/hp/ontologies/2023/10/untitled-ontology-23#> SELECT ?name ?age ?gender ?race WHERE { ?victim rdf:type ont:Victim. ?victim ont:hasName ?name. ?victim ont:hasRace ?race. ?victim ont:hasAge ?age. ?victim ont:hasGender ?gender. FILTER (?age >= 0 && ?age <= 99)}",
-    "default-graph-uri": "tag:stardog:designer:Test:data:fatal-police-shootings-data"
-  }
-};
-var pairs_arr=[]
-var total=0;
 
-var len=0;
-var table_race = [];
-var table_gender=[];
-var table_name = [];
-var table_age = [];
-$.ajax(settings).done(function (response) { 
-  var totalResponse = response.getElementsByTagName("result");
-          len = totalResponse.length;
-         for(var i=0; i<totalResponse.length; i++)
-          {
-            
-              var new_race = totalResponse[i].getElementsByTagName("literal")[0].innerHTML;
-              var new_gender = totalResponse[i].getElementsByTagName("literal")[1].innerHTML;
-              var new_name = totalResponse[i].getElementsByTagName("literal")[2].innerHTML;
-              var new_age = totalResponse[i].getElementsByTagName("literal")[3].innerHTML;
-            
-              table_race[i] = new_race;
-              table_gender[i] = new_gender;
-              table_name[i] = new_name;
-              table_age[i] = new_age;            
-
-          }
-
-                  
-          
-          
-        });
+}
 
 
 
-function onSubmit(){
-    var i=0;
 
-      let table = '<table>';  
-      table += '<tr><th>Race</th><th>Gender</th><th>Name</th><th>Age</th></tr>';  
+function build_table(){
 
-      var low,high;
+    var low,high;
       var to_ch = input_age;
       if(input_age[1]=='-')
       {
@@ -481,25 +443,95 @@ function onSubmit(){
         low = parseInt(input_age.substring(0,2));
         high = parseInt(input_age.substring(3));
       }
+    var queryString = "";
+    queryString += "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> PREFIX ont: <http://www.semanticweb.org/hp/ontologies/2023/10/untitled-ontology-23#> SELECT ?name ?age ?gender ?race WHERE { ?victim rdf:type ont:Victim. ?victim ont:hasName ?name. ?victim ont:hasRace ?race. ?victim ont:hasAge ?age. ?victim ont:hasGender ?gender. FILTER (?age >= ";
+    queryString += low;
+    queryString += " && ?age <= ";
+    queryString += high;
+    queryString += ") FILTER (STR(?race) = \"";
+    queryString += input_race;
+    queryString += "\") FILTER (STR(?gender) = \"";
+    queryString += input_gender;
+    queryString += "\")}";
+
+     
+    var myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+    myHeaders.append("Authorization", "Basic VGVzdDoxMjM0NTY3ODkxMjM=");
+
+    var urlencoded = new URLSearchParams();
+    urlencoded.append("query",queryString);
+    urlencoded.append("default-graph-uri", "tag:stardog:designer:Test:data:fatal-police-shootings-data");
+
+    var requestOptions = {
+      method: 'POST',
+      headers: myHeaders,
+      body: urlencoded,
+      redirect: 'follow'
+    };
+
+    fetch("https://sd-d7b9ce2e.stardog.cloud:5820/State/query", requestOptions)
+    .then(result => result.text())
+      .then(htmlString => {
+      // Convert the HTML string to an HTML document
+      const parser = new DOMParser();
+      const htmlDocument = parser.parseFromString(htmlString, 'text/html');
+
+      // Extract elements and create an HTML collection
+      const htmlCollection = htmlDocument.body.children;
+
+      // Now you can use the htmlCollection as needed
+      console.log(htmlCollection[0].getElementsByTagName("result").length);
+       len = htmlCollection[0].getElementsByTagName("result").length;
+      for(var i=0; i<htmlCollection[0].getElementsByTagName("result").length; i+=4)
+          {
+            
+              var new_race = htmlCollection[0].getElementsByTagName("literal")[i].innerHTML;
+              var new_gender = htmlCollection[0].getElementsByTagName("literal")[i+1].innerHTML;
+              var new_name = htmlCollection[0].getElementsByTagName("literal")[i+2].innerHTML;
+              var new_age = htmlCollection[0].getElementsByTagName("literal")[i+3].innerHTML;
+            
+              table_race[i] = new_race;
+              table_gender[i] = new_gender;
+              table_name[i] = new_name;
+              table_age[i] = new_age;            
+              // console.log(new_race); 
+              // console.log(new_gender); 
+              // console.log(new_name); 
+              // console.log(new_age); 
+          }
+
+          let table = '<table>';  
+      table += '<tr><th>Race</th><th>Gender</th><th>Name</th><th>Age</th></tr>';  
+
+      
       console.log(low); console.log(high);
+      console.log(len);
+       var i=0;
     while(i<len) {  
     
-      
-      if(table_race[i] == input_race && table_gender[i]==input_gender && table_age[i]>=low && table_age[i]<=high)
-      {
+      console.log(table_race[i]);
+      console.log(table_gender[i]);
+      console.log(table_age[i]);
+     
         table += '<tr>';  
         table += '<td>';
           table+=table_race[i]+'</td><td>'+table_gender[i]+'</td><td>'+table_name[i]+'</td><td>'+table_age[i]+'</td></tr>';
-      }
+      
 
 
         
 
-      i++;
+      i+=4;
     }  
     table += '</table>';  
     const tableContainer = document.getElementById('table-container');  
     tableContainer.innerHTML = table;  
+    })
+      .catch(error => console.log('error', error));
+
+
+      
 }
 
 

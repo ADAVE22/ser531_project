@@ -1,8 +1,11 @@
 <!DOCTYPE html>
 <html>
+<head>
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+</head>
 <body>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script type="text/javascript" src="api.js"></script>
 <link rel="stylesheet" href="index.css">
 
@@ -56,28 +59,28 @@
 <div class="dropdown" style="margin-left:30px;">
   <button class="dropbtn">Gender</button>
   <div class="dropdown-content">
-    <a  onclick="submitGender('M')" value="M">M</a>
-    <a  onclick="submitGender('F')" value="F">F</a>
+    <a  onclick="submitGender('M')">M</a>
+    <a  onclick="submitGender('F')">F</a>
   </div>
 </div>
 
 <div class="dropdown" style="margin-left:36px;" >
   <button class="dropbtn">Age</button>
   <div class="dropdown-content">
-    <a onclick="submitAge('0-9')" value="0-9">0-9</a>
-    <a onclick="submitAge('10-19')" value="10-19">10-19</a>
-    <a onclick="submitAge('20-29')" value="20-29">20-29</a>
-    <a onclick="submitAge('30-39')" value="30-39">30-39</a>
-    <a onclick="submitAge('40-49')" value="40-49">40-49</a>
-    <a onclick="submitAge('50-59')" value="50-59">50-59</a>
-    <a onclick="submitAge('60-69')" value="60-69">60-69</a>
-    <a onclick="submitAge('70-79')" value="70-79">70-79</a>
-    <a onclick="submitAge('80-89')" value="80-89">80-89</a>
-    <a onclick="submitAge('90-99')" value="90-99">90-99</a>
+    <a onclick="submitAge('0-9')">0-9</a>
+    <a onclick="submitAge('10-19')">10-19</a>
+    <a onclick="submitAge('20-29')">20-29</a>
+    <a onclick="submitAge('30-39')">30-39</a>
+    <a onclick="submitAge('40-49')">40-49</a>
+    <a onclick="submitAge('50-59')">50-59</a>
+    <a onclick="submitAge('60-69')">60-69</a>
+    <a onclick="submitAge('70-79')">70-79</a>
+    <a onclick="submitAge('80-89')">80-89</a>
+    <a onclick="submitAge('90-99')">90-99</a>
   </div>
 </div><br><br>
 <div>
-    <button style="float:left; margin-left:20px;" onclick="onSubmit()">Generate Table</button>
+    <button style="float:left; margin-left:20px;" onclick="build_table()">Generate Table</button>
 </div>
 <br><br><br>
 <div id="table-container"></div>  
